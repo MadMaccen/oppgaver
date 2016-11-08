@@ -6,7 +6,14 @@ author: Mats Reime
 
 # Introduksjon {.intro}
 
-La oss se på å få ett display til å telle.
+La oss dimme lysdioder med hjelp av PWM. PWM står for Pulse-Width-Modulation,
+på norsk betyr dette Puls-Bredde-Modulering. Dette er en styring som brukes der en vil ha riktig spenning, men regulere effekten. Som feks til å dimme en lysdiode som ikke skal ha lavere eller høyere spenning enn 1,8-2,2volt.
+
+Arduino leverer firkantpuls på 5volt. Denne firkantpulsen har fast fast periodetid (frekvens), men vi kan justere pulsbredden.
+
+### Illustrasjon av PWM (PBM) {.protip}
+
+![PWMillustarsjon](pwm_illustrasjon.gif)
 
 # Steg 1: Finn frem utstyr {.activity}
 
@@ -18,15 +25,34 @@ La oss se på å få ett display til å telle.
 + 2 motstander 220 Ohm (Fargekode: rød-rød-brun-gull)
 + 2 knappbrytere
 + 2 lysdioder (du velger farge)
-+ x antall ledninger
++ 12 ledninger
 
 
 ![kopling](kopling.png)
 
 # Steg 2: Utforskning {.activity}
 
-´´´cpp
+Alle pinner som har ~ symbolet, har PWM egenskapen.
 
++ Sjekk at alt er riktig koplet opp.
++ PIN 5 & PIN 6 er brukt til lys.
+
+
+### Tips! {.protip}
+```cpp
+Bruk gjerne kommentarer til deg selv når du programmerer. Da er det lettere å
+forstå koden mens du holder på.
+
+// Dette er en linje kommentar til koden.
+
+/*Dette er flere linjer
+med kommentarer*/
+```
+# Steg 3: Dimme ett lys med knappbrytere {.activity}
+
+## Skriv kode {.activity}
+
+```cpp
 int led1 = 5;
 int led2 = 6;
 
@@ -36,6 +62,7 @@ int knapp2 = 3;
 int PWM_1 = 0;
 int PWM_2 = 255;
 
+
 void setup() {
 
   pinMode(led1, OUTPUT);
@@ -44,6 +71,55 @@ void setup() {
   pinMode(knapp2, INPUT);
   Serial.begin(9600);
 }
+
+
+
+void loop() {
+
+  while (digitalRead(knapp2) == HIGH)
+  {
+    PWM_1 = PWM_1 + 5;
+    if (PWM_1 >= 255) { //Sjekker at PWM_1 ikke går høyere enn 255.
+      PWM_1 = 255;
+    }
+    analogWrite(led1, PWM_1);
+    delay(100);
+    Serial.println(PWM_1);
+  }
+
+  while (digitalRead(knapp1) == HIGH)
+  {
+    PWM_1 = PWM_1 - 5;
+    if (PWM_1 <= 0) { //Sjekker at PWM_1 ikke går lavere enn 0.
+      PWM_1 = 0;
+    }
+    analogWrite(led1, PWM_1);
+    delay(100);
+    Serial.println(PWM_1);
+  }
+
+}
+
+```
+
+
+# Steg 4: Test ut dimmefunksjonen {.activity}
+
+## Sjekkliste {.check}
+
++ Øker styrker i lyset.
++ Synker styrken i lyset.
++ Får du opp PWM verdien i Serial Monitor.
+
+### Utfordringer {.challenge}
++ Klarer du å endre teller intervallet, slik at styrken øker raskere eller tregere.
+
+
+# Steg 5: Dimme begge lys med knappbrytere {.activity}
+
+## Skriv kode {.activity}
+```cpp
+...
 
 void loop() {
   analogWrite(led1, PWM_1);
@@ -97,4 +173,13 @@ void loop() {
   }
 }
 
-´´´
+```
+
+## Sjekkliste {.check}
+
++ Øker styrker i det ene lyset samtidig som det andre synker.
++ Får du opp PWM verdien i Serial Monitor.
+
+### Utfordringer {.challenge}
++ Klarer du å endre teller intervallet, slik at styrken øker raskere eller tregere.
++ Klarer du å gjøre dimmefunksjonen automatisk.
